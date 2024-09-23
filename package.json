@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "prebuild": "fuels build",
+    "fuels:deploy": "fuels deploy",
     "dev": "vite",
     "build": "npm run prebuild && tsc -b && vite build",
     "lint": "eslint .",

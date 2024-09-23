@@ -24,8 +24,9 @@ export default function LocalFaucet({ refetch, addressToFund }: Props) {
     if (!wallet) return;
     setIsLoading(true);
     try {
+      console.log(process.env.VITE_GENESIS_WALLET_PRIVATE_KEY)
       const genesis = new WalletUnlocked(
-        process.env.VITE_GENESIS_WALLET_PRIVATE_KEY as string,
+        "0x01" as string,
         wallet.provider,
       );
       const tx = await genesis.transfer(

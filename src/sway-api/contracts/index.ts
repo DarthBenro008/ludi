@@ -10,5 +10,5 @@
   Fuel-Core version: 0.36.0
 */
 
-export { TestContract } from './TestContract';
-export { TestContractFactory } from './TestContractFactory';
+export { LudiContract } from './LudiContract';
+export { LudiContractFactory } from './LudiContractFactory';
