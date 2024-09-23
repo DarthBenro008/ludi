@@ -1,9 +1,9 @@
 import { useDisconnect, useWallet, useBalance } from "@fuels/react";
 import { useEffect } from "react";
 
-import Button from "./Button";
 import LocalFaucet from "./LocalFaucet";
 import { isLocal, renderFormattedBalance } from "../lib.tsx";
+import { Button } from "./ui/button.tsx";
 
 export default function Wallet() {
   const { disconnect } = useDisconnect();

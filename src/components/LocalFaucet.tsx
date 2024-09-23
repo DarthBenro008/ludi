@@ -2,8 +2,8 @@ import { Address, bn, WalletUnlocked } from "fuels";
 import { useWallet } from "@fuels/react";
 import { useState } from "react";
 
-import Button from "./Button";
 import { useNotification } from "../hooks/useNotification.tsx";
+import { Button } from "./ui/button.tsx";
 
 type Props = {
   refetch: () => void;
