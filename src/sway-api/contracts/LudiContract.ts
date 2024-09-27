@@ -20,6 +20,7 @@ import type {
   BN,
   FunctionFragment,
   InvokeFunction,
+  StrSlice,
 } from 'fuels';
 
 import type { Enum, Result } from "./common";
@@ -37,6 +38,8 @@ export type ContractIdInput = { bits: string };
 export type ContractIdOutput = ContractIdInput;
 export type DepositLogEventInput = { identifier: IdentityInput, amount: BigNumberish, asset_id: AssetIdInput };
 export type DepositLogEventOutput = { identifier: IdentityOutput, amount: BN, asset_id: AssetIdOutput };
+export type RollDiceLogEventInput = { identifier: IdentityInput, force: string, amount: BigNumberish, result: boolean };
+export type RollDiceLogEventOutput = { identifier: IdentityOutput, force: string, amount: BN, result: boolean };
 
 const abi = {
   "programType": "contract",
@@ -46,6 +49,10 @@ const abi = {
     {
       "type": "()",
       "concreteTypeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+    },
+    {
+      "type": "b256",
+      "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
     },
     {
       "type": "enum error::Error",
@@ -62,9 +69,18 @@ const abi = {
       ]
     },
     {
+      "type": "str",
+      "concreteTypeId": "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a"
+    },
+    {
       "type": "struct DepositLogEvent",
       "concreteTypeId": "3201a119c76261e2a66d7afef95e4f952900c848101bf63399058332ebb3e47e",
       "metadataTypeId": 6
+    },
+    {
+      "type": "struct RollDiceLogEvent",
+      "concreteTypeId": "08d3efe50bc616bf84800bf1e8d73bef087d6723db46169e359e22fd56b85b40",
+      "metadataTypeId": 7
     },
     {
       "type": "u64",
@@ -73,7 +89,7 @@ const abi = {
   ],
   "metadataTypes": [
     {
-      "type": "b256",
+      "type": "bool",
       "metadataTypeId": 0
     },
     {
@@ -112,11 +128,11 @@ const abi = {
       "components": [
         {
           "name": "Address",
-          "typeId": 7
+          "typeId": 8
         },
         {
           "name": "ContractId",
-          "typeId": 9
+          "typeId": 10
         }
       ]
     },
@@ -160,37 +176,59 @@ const abi = {
         },
         {
           "name": "asset_id",
-          "typeId": 8
+          "typeId": 9
+        }
+      ]
+    },
+    {
+      "type": "struct RollDiceLogEvent",
+      "metadataTypeId": 7,
+      "components": [
+        {
+          "name": "identifier",
+          "typeId": 2
+        },
+        {
+          "name": "force",
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        },
+        {
+          "name": "amount",
+          "typeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
+        },
+        {
+          "name": "result",
+          "typeId": 0
         }
       ]
     },
     {
       "type": "struct std::address::Address",
-      "metadataTypeId": 7,
+      "metadataTypeId": 8,
       "components": [
         {
           "name": "bits",
-          "typeId": 0
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         }
       ]
     },
     {
       "type": "struct std::asset_id::AssetId",
-      "metadataTypeId": 8,
+      "metadataTypeId": 9,
       "components": [
         {
           "name": "bits",
-          "typeId": 0
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         }
       ]
     },
     {
       "type": "struct std::contract_id::ContractId",
-      "metadataTypeId": 9,
+      "metadataTypeId": 10,
       "components": [
         {
           "name": "bits",
-          "typeId": 0
+          "typeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
         }
       ]
     }
@@ -243,6 +281,29 @@ const abi = {
     {
       "inputs": [
         {
+          "name": "force",
+          "concreteTypeId": "7c5ee1cecf5f8eacd1284feb5f0bf2bdea533a51e2f0c9aabe9236d335989f3b"
+        }
+      ],
+      "name": "roll_dice",
+      "output": "47d526bb28c49cc34ef6e1af01ecff7688d9d66974ca3696d69ebcefc42419ef",
+      "attributes": [
+        {
+          "name": "payable",
+          "arguments": []
+        },
+        {
+          "name": "storage",
+          "arguments": [
+            "read",
+            "write"
+          ]
+        }
+      ]
+    },
+    {
+      "inputs": [
+        {
           "name": "amount",
           "concreteTypeId": "1506e6f44c1d6291cdf46395a8e573276a4fa79e8ace3fc891e092ef32d1b0a0"
         }
@@ -264,6 +325,18 @@ const abi = {
     {
       "logId": "3603338308964475362",
       "concreteTypeId": "3201a119c76261e2a66d7afef95e4f952900c848101bf63399058332ebb3e47e"
+    },
+    {
+      "logId": "11005223066266839355",
+      "concreteTypeId": "98ba681212c5293b46b67c3ecb774e0a2e3d324008580c35fc533e1c1a762d7e"
+    },
+    {
+      "logId": "636115739413452479",
+      "concreteTypeId": "08d3efe50bc616bf84800bf1e8d73bef087d6723db46169e359e22fd56b85b40"
+    },
+    {
+      "logId": "10098701174489624218",
+      "concreteTypeId": "8c25cb3686462e9a86d2883c5688a22fe738b0bbc85f458d2d2b5f3f667c6d5a"
     }
   ],
   "messagesTypes": [],
@@ -286,6 +359,7 @@ export class LudiContractInterface extends Interface {
     deposit: FunctionFragment;
     get_gamble_pool: FunctionFragment;
     get_stake_pool: FunctionFragment;
+    roll_dice: FunctionFragment;
     withdraw: FunctionFragment;
   };
 }
@@ -299,6 +373,7 @@ export class LudiContract extends Contract {
     deposit: InvokeFunction<[], Result<void, ErrorOutput>>;
     get_gamble_pool: InvokeFunction<[], BN>;
     get_stake_pool: InvokeFunction<[], BN>;
+    roll_dice: InvokeFunction<[force: string], Result<void, ErrorOutput>>;
     withdraw: InvokeFunction<[amount: BigNumberish], Result<void, ErrorOutput>>;
   };
 
