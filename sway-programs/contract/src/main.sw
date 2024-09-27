@@ -27,9 +27,9 @@ abi Ludi
     #[payable]
     #[storage(read, write)]
     fn deposit() -> Result<(), Error>;
-    #[payable]
-    #[storage(read, write)]
-    fn roll_dice(force: b256) -> Result<(), Error>;
+    // #[payable]
+    // #[storage(read, write)]
+    // fn roll_dice(force: b256) -> Result<(), Error>;
 }
 pub struct
  DepositLogEvent {
@@ -175,67 +175,67 @@ impl Ludi
         });
         Ok(())
     }
-    #[payable]
-    #[storage(read, write)]
-    fn roll_dice(force: b256) -> Result<(), Error> {
-        let sender = msg_sender().unwrap();
-        let vrf = abi(Vrf, VRF_ID);
-        let fee = vrf.get_fee(AssetId::base());
-        let amount = msg_amount();
-        require(amount > 0, Error::AmountMustBeGreaterThanZero);
-        let total_gamble_pool = storage.gamble_pool_total.read();
-        require(amount <= (total_gamble_pool / 2), Error::GamblePoolExceeded);
-        let _ = vrf.request {
-            gas: 1_000_000,
-            asset_id: AssetId::base().bits(),
-            coins: fee,
-        }(force);
-        match vrf.get_request_by_seed(force) {
-            Some(r) => match r.state {
-                RandomnessState::Fulfilled(x) => {
-                    if x.randomness.bits()[0] <= 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa {
-                        // won
-                        let winnings = amount * 2;
-                        require(winnings <= total_gamble_pool, Error::GamblePoolExceeded);
+    // #[payable]
+    // #[storage(read, write)]
+    // fn roll_dice(force: b256) -> Result<(), Error> {
+    //     let sender = msg_sender().unwrap();
+    //     let vrf = abi(Vrf, VRF_ID);
+    //     let fee = vrf.get_fee(AssetId::base());
+    //     let amount = msg_amount();
+    //     require(amount > 0, Error::AmountMustBeGreaterThanZero);
+    //     let total_gamble_pool = storage.gamble_pool_total.read();
+    //     require(amount <= (total_gamble_pool / 2), Error::GamblePoolExceeded);
+    //     let _ = vrf.request {
+    //         gas: 1_000_000,
+    //         asset_id: AssetId::base().bits(),
+    //         coins: fee,
+    //     }(force);
+    //     match vrf.get_request_by_seed(force) {
+    //         Some(r) => match r.state {
+    //             RandomnessState::Fulfilled(x) => {
+    //                 if x.randomness.bits()[0] <= 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa {
+    //                     // won
+    //                     let winnings = amount * 2;
+    //                     require(winnings <= total_gamble_pool, Error::GamblePoolExceeded);
 
-                        // Update gamble pool
-                        let new_total_gamble_pool = total_gamble_pool - winnings;
-                        storage.gamble_pool_total.write(new_total_gamble_pool);
+    //                     // Update gamble pool
+    //                     let new_total_gamble_pool = total_gamble_pool - winnings;
+    //                     storage.gamble_pool_total.write(new_total_gamble_pool);
                         
-                        // Update winner's deposit
-                        let mut winner_deposit = storage.gamble_pool.get(sender).try_read().unwrap();
-                        winner_deposit.gamble_share = (winner_deposit.gamble_share * new_total_gamble_pool) / total_gamble_pool;
-                        storage.gamble_pool.insert(sender, winner_deposit);
+    //                     // Update winner's deposit
+    //                     let mut winner_deposit = storage.gamble_pool.get(sender).try_read().unwrap();
+    //                     winner_deposit.gamble_share = (winner_deposit.gamble_share * new_total_gamble_pool) / total_gamble_pool;
+    //                     storage.gamble_pool.insert(sender, winner_deposit);
 
-                        transfer(sender, AssetId::base(), winnings);
-                    } else {
-                        // lost
-                        let new_total_gamble_pool = total_gamble_pool + amount;
-                        storage.gamble_pool_total.write(new_total_gamble_pool);
+    //                     transfer(sender, AssetId::base(), winnings);
+    //                 } else {
+    //                     // lost
+    //                     let new_total_gamble_pool = total_gamble_pool + amount;
+    //                     storage.gamble_pool_total.write(new_total_gamble_pool);
 
-                        // Update loser's share
-                        let mut loser_deposit = storage.gamble_pool.get(sender).try_read().unwrap();
-                        loser_deposit.gamble_share = (loser_deposit.gamble_share * total_gamble_pool + amount * 100_000) / new_total_gamble_pool;
-                        storage.gamble_pool.insert(sender, loser_deposit);
-                    }
-                    log(RollDiceLogEvent {
-                        identifier: sender,
-                        force: force,
-                        amount: amount,
-                        result: x.randomness.bits()[0] <= 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
-                    });
-                    // ... log event ...
-                },
-                _ => {
-                    log("Randomness request is not yet fulfilled.");
-                    return Err(Error::RandomnessRequestNotFound);
-                }
-            },
-            None => {
-                log("No randomness request found.");
-                return Err(Error::RandomnessRequestNotFound);
-            }
-        }
-        Ok(())
-    }
+    //                     // Update loser's share
+    //                     let mut loser_deposit = storage.gamble_pool.get(sender).try_read().unwrap();
+    //                     loser_deposit.gamble_share = (loser_deposit.gamble_share * total_gamble_pool + amount * 100_000) / new_total_gamble_pool;
+    //                     storage.gamble_pool.insert(sender, loser_deposit);
+    //                 }
+    //                 log(RollDiceLogEvent {
+    //                     identifier: sender,
+    //                     force: force,
+    //                     amount: amount,
+    //                     result: x.randomness.bits()[0] <= 0x2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa,
+    //                 });
+    //                 // ... log event ...
+    //             },
+    //             _ => {
+    //                 log("Randomness request is not yet fulfilled.");
+    //                 return Err(Error::RandomnessRequestNotFound);
+    //             }
+    //         },
+    //         None => {
+    //             log("No randomness request found.");
+    //             return Err(Error::RandomnessRequestNotFound);
+    //         }
+    //     }
+    //     Ok(())
+    // }
 }

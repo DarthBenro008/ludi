@@ -5,7 +5,7 @@
 /* eslint-disable @typescript-eslint/consistent-type-imports */
 
 /*
-  Fuels version: 0.94.8
+  Fuels version: 0.94.9
   Forc version: 0.64.0
   Fuel-Core version: 0.36.0
 */
@@ -24,8 +24,8 @@ import type {
 
 import type { Enum, Result } from "./common";
 
-export enum ErrorInput { VrfRequestFailed = 'VrfRequestFailed', RoundIsInProgres = 'RoundIsInProgres', InsufficientBalance = 'InsufficientBalance' };
-export enum ErrorOutput { VrfRequestFailed = 'VrfRequestFailed', RoundIsInProgres = 'RoundIsInProgres', InsufficientBalance = 'InsufficientBalance' };
+export enum ErrorInput { VrfRequestFailed = 'VrfRequestFailed', RoundIsInProgres = 'RoundIsInProgres', InsufficientBalance = 'InsufficientBalance', RandomnessRequestNotFound = 'RandomnessRequestNotFound', AmountMustBeGreaterThanZero = 'AmountMustBeGreaterThanZero', GamblePoolExceeded = 'GamblePoolExceeded' };
+export enum ErrorOutput { VrfRequestFailed = 'VrfRequestFailed', RoundIsInProgres = 'RoundIsInProgres', InsufficientBalance = 'InsufficientBalance', RandomnessRequestNotFound = 'RandomnessRequestNotFound', AmountMustBeGreaterThanZero = 'AmountMustBeGreaterThanZero', GamblePoolExceeded = 'GamblePoolExceeded' };
 export type IdentityInput = Enum<{ Address: AddressInput, ContractId: ContractIdInput }>;
 export type IdentityOutput = Enum<{ Address: AddressOutput, ContractId: ContractIdOutput }>;
 
@@ -90,6 +90,18 @@ const abi = {
         },
         {
           "name": "InsufficientBalance",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "RandomnessRequestNotFound",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "AmountMustBeGreaterThanZero",
+          "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
+        },
+        {
+          "name": "GamblePoolExceeded",
           "typeId": "2e38e77b22c314a449e91fafed92a43826ac6aa403ae6a8acb6cf58239fbaf5d"
         }
       ]
@@ -260,7 +272,7 @@ const abi = {
 
 const storageSlots: StorageSlot[] = [
   {
-    "key": "23f7497702dabda305cf30725d0cd559c38dd0e17451bd6cb74841f7f691ca05",
+    "key": "f39a611259c060a61501a6cade7445631862814bdca8bb73c160d7f14995a10d",
     "value": "0000000000000000000000000000000000000000000000000000000000000000"
   }
 ];

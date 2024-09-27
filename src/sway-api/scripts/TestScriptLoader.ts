@@ -18,8 +18,8 @@ import {
   Script,
 } from 'fuels';
 
-export type TestScriptInputs = [input: BigNumberish];
-export type TestScriptOutput = BN;
+export type TestScriptLoaderInputs = [input: BigNumberish];
+export type TestScriptLoaderOutput = BN;
 
 const abi = {
   "programType": "script",
@@ -50,9 +50,9 @@ const abi = {
   "configurables": []
 };
 
-const bytecode = decompressBytecode('H4sIAAAAAAAAA02Sv4sTQRzFX9YVgo2jbiTMeZricmwZsFGvcJbdsFlDcA4DWjhs7CzDInLl/glaqFdaWs6ChaWl5ZWW2wq3YCNErohvNobcNPPmM98fb76M/D3CG8BDu7yFWX/viPUa8lzjPTyhn1b6lcK1vMFj7j73hzquVjq1y2KCbjj2Sz2tFoWizgLw7meRUEcHysT2yEQAcyKnHd9LAiUiX5EdkUWsc0J9nXmv23pRUOq02tWOq7MtZ/wj+QsYrO7jxUXt6Yvap/eXMj5zPVw/VSQ+DhNAJkvoqT3NG3HLMe5Bfo4ePfTD5kCx7w/W7YfpV+f/pNDUWQ/sPWj1eOjy+ztuyy03z60wz+wNk9qbzpvIgrKXDfF2gg79XCXz9o6T8lAD4f5cyfkSIpurPAPcnETEOaW2zht9J2/UPr3f1bEdtX427++2evP+d5d4fYnXPD/Yne1kF2ftlpupva2PheD9Km8G9/QYrjZnm7i4BbX4X+9Lqzd9vm05/YpwFsBEo46ZjTCcAR+AKx+7nDH/iIw/Q6Y15B+e/wqckn/i/ZMVkPJH/QPs/31HYAIAAA==');
+const bytecode = decompressBytecode('H4sIAAAAAAAAA5NyMGAIcGRQkHIJYNjlycBg5MDSqOAqzBDkKsDi5cLAcOrLxyW/Cr58EQ0zeii7sY9rU8uVhXP0Xy7a0mroqTCzUwwAYbca6UAAAAA=');
 
-export class TestScript extends Script<TestScriptInputs, TestScriptOutput> {
+export class TestScriptLoader extends Script<TestScriptLoaderInputs, TestScriptLoaderOutput> {
 
   static readonly abi = abi;
   static readonly bytecode = bytecode;

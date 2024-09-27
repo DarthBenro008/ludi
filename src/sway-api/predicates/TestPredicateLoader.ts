@@ -20,12 +20,12 @@ import {
   Provider,
 } from 'fuels';
 
-export type TestPredicateConfigurables = undefined;
+export type TestPredicateLoaderConfigurables = undefined;
 
-export type TestPredicateInputs = [password: BigNumberish];
+export type TestPredicateLoaderInputs = [password: BigNumberish];
 
-export type TestPredicateParameters = Omit<
-  PredicateParams<TestPredicateInputs, TestPredicateConfigurables>,
+export type TestPredicateLoaderParameters = Omit<
+  PredicateParams<TestPredicateLoaderInputs, TestPredicateLoaderConfigurables>,
   'abi' | 'bytecode'
 >;
 
@@ -81,16 +81,16 @@ const abi = {
   "configurables": []
 };
 
-const bytecode = decompressBytecode('H4sIAAAAAAAAA01QP0vDQBx9iRGDjTaQDuVcinTIWBBEtwtpSWyWGzsYxc1Rg4hjvoKDf0Y/wg1+AD+CHyGrYMFFaOmQvhy05ODg3fu99+7xE38jPAA2zLGe8vrL8usa4lfhGSjvJXau5/DyTHs30TFUovtXE0DFun8ZAQHvo0SweRdj2EHkSHLWKRPpmdJ/yPkdvX6Rwg0nTsn3wOCoV6pMh/S54YUj2cWlx6PngJpbw88daTSSOPts/h4ZPhpKZp61MmebzDzWnZx9mNNtcKM/Gvekz27kOuS69LrEFn1y2yXRaStPtfL2xQ8wWJxgtqpstaqcZm8i/sZQAi/A3qsLszcRf0AkFYp095y7KMU/+aWPd87fqJsugDV20P+heAEAAA==');
+const bytecode = decompressBytecode('H4sIAAAAAAAAA5NyMGAIcGRQkHIJYNjlycBg5MDSqOAqzBDkKsDi5cLAILxk7ettL48bRCQZuoSYr39uLcdiyfpxx8nGer5Zx7z49AGzDGfNQAAAAA==');
 
-export class TestPredicate extends Predicate<
-  TestPredicateInputs,
-  TestPredicateConfigurables
+export class TestPredicateLoader extends Predicate<
+  TestPredicateLoaderInputs,
+  TestPredicateLoaderConfigurables
 > {
   static readonly abi = abi;
   static readonly bytecode = bytecode;
 
-  constructor(params: TestPredicateParameters) {
+  constructor(params: TestPredicateLoaderParameters) {
     super({ abi, bytecode, ...params });
   }
 }

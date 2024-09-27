@@ -11,6 +11,13 @@ import {
 import { TrendingUp } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
 import { Label, PolarRadiusAxis, RadialBar, RadialBarChart } from "recharts"
+import { RocketIcon } from "@radix-ui/react-icons"
+
+import {
+    Alert,
+    AlertDescription,
+    AlertTitle,
+} from "@/components/ui/alert"
 
 import {
     ChartConfig,
@@ -18,22 +25,38 @@ import {
     ChartTooltip,
     ChartTooltipContent,
 } from "@/components/ui/chart"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label as LabelUI } from "@/components/ui/label"
+import { useEffect, useState } from "react"
+import { useNotification } from "@/hooks/useNotification";
+import { contractId } from "@/lib";
+import { LudiContract } from "@/sway-api";
+import { useWallet } from "@fuels/react"
 
 export const description = "A stacked area chart"
 
-function StakeCard() {
+function StakeCard({ investment, fetchData }: { investment: number, fetchData: () => Promise<void> }) {
     return (
         <Card className="sm:col-span-2 w-[550px]">
             <CardContent className="grid grid-cols-2 p-4">
                 <div className="flex flex-col gap-3 justify-center">
                     <CardTitle>Your Current Stake</CardTitle>
                     <CardDescription className="text-balance max-w-lg leading-relaxed">
-                        Stake your coins to earn rewards.
+                        You earn a minimum of 5% APR.
                     </CardDescription>
-                    <Button>Stake More</Button>
+                    <StakeDialog fetchData={fetchData} />
                 </div>
                 <div className="flex flex-row w-full items-center gap-2 justify-center">
-                    <p className="text-4xl font-mono">0</p>
+                    <p className="text-4xl font-mono">{investment}</p>
                     <p>ETH</p>
                 </div>
             </CardContent>
@@ -43,7 +66,7 @@ function StakeCard() {
 
 
 
-const chartDataDistribution = [{ month: "january", stake_pool: 1260, gamble_pool: 570 }]
+
 
 const chartConfigDistribution = {
     desktop: {
@@ -56,8 +79,10 @@ const chartConfigDistribution = {
     },
 } satisfies ChartConfig
 
-export function StakeDistribution() {
-    const totalStake = chartDataDistribution[0].stake_pool + chartDataDistribution[0].gamble_pool
+export function StakeDistribution({ stakePoolInvestment, gamblePoolInvestment }: { stakePoolInvestment: number, gamblePoolInvestment: number }) {
+    const totalStake = stakePoolInvestment + gamblePoolInvestment
+
+    const chartDataDistribution = [{ month: "january", stake_pool: stakePoolInvestment, gamble_pool: gamblePoolInvestment }]
 
     return (
         <Card className="flex flex-col">
@@ -225,8 +250,182 @@ export function PortfolioCard() {
     )
 }
 
+export function StakeDialog({ fetchData }: { fetchData: () => Promise<void> }) {
+    const {
+        errorNotification,
+        transactionSubmitNotification,
+        transactionSuccessNotification,
+    } = useNotification();
+    const [stakeAmount, setStakeAmount] = useState(0);
+    const { wallet } = useWallet();
+    const [contract, setContract] = useState<LudiContract>();
+    useEffect(() => {
+        if (wallet) {
+            setContract(new LudiContract(contractId, wallet));
+        }
+    }, [wallet]);
+    const [open, setOpen] = useState(false);
+
+    const handleStake = async () => {
+        try {
+            const asset = contract?.provider.getBaseAssetId();
+            const call = await contract!!.functions.deposit().callParams({
+                forward: [stakeAmount * 1000000000, asset as string],
+            }).call();
+            transactionSubmitNotification(call.transactionId);
+            const result = await call.waitForResult();
+            transactionSuccessNotification(result.transactionId);
+            console.log("amount", result.logs[0].amount.toNumber())
+            console.log(result.logs)
+            console.log(result.value)
+            fetchData();
+            setOpen(false);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button>Stake More</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Stake More</DialogTitle>
+                    <DialogDescription>
+                        Stake more ETH to earn rewards. You earn a minimum of 5% APR.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <LabelUI htmlFor="name" className="text-right">
+                            ETH Amount
+                        </LabelUI>
+                        <Input id="name" type="number" value={stakeAmount} onChange={(e) => setStakeAmount(Number(e.target.value))} className="col-span-3" />
+                    </div>
+                    <Alert>
+                        <RocketIcon className="h-4 w-4" />
+                        <AlertTitle>Heads up!</AlertTitle>
+                        <AlertDescription>
+                            Your stake will be split 50-50 between stake and gamble pools.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+                <DialogFooter>
+                    <Button className="w-full" type="submit" onClick={handleStake}>Stake</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
+export function WithdrawDialog({ fetchData }: { fetchData: () => Promise<void> }) {
+    const {
+        errorNotification,
+        transactionSubmitNotification,
+        transactionSuccessNotification,
+    } = useNotification();
+    const [stakeAmount, setStakeAmount] = useState(0);
+    const { wallet } = useWallet();
+    const [contract, setContract] = useState<LudiContract>();
+    useEffect(() => {
+        if (wallet) {
+            setContract(new LudiContract(contractId, wallet));
+        }
+    }, [wallet]);
+    const [open, setOpen] = useState(false);
+    const handleWithdraw = async () => {
+        try {
+            const call = await contract!!.functions.withdraw(stakeAmount * 1000000000).call();
+            transactionSubmitNotification(call.transactionId);
+            const result = await call.waitForResult();
+            transactionSuccessNotification(result.transactionId);
+            console.log(result.value)
+            fetchData();
+            setOpen(false);
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    return (
+        <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+                <Button variant={"destructive"}>Withdraw</Button>
+            </DialogTrigger>
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Withdraw</DialogTitle>
+                    <DialogDescription>
+                        Withdraw your ETH.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div className="grid grid-cols-4 items-center gap-4">
+                        <LabelUI htmlFor="name" className="text-right">
+                            ETH Amount
+                        </LabelUI>
+                        <Input id="name" type="number" value={stakeAmount} onChange={(e) => setStakeAmount(Number(e.target.value))} className="col-span-3" />
+                    </div>
+                    <Alert>
+                        <RocketIcon className="h-4 w-4" />
+                        <AlertTitle>Heads up!</AlertTitle>
+                        <AlertDescription>
+                            Your stake will be withdrawn from the stake pool.
+                        </AlertDescription>
+                    </Alert>
+                </div>
+                <DialogFooter>
+                    <Button variant={"destructive"} className="w-full" type="submit" onClick={handleWithdraw}>Withdraw</Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    )
+}
+
 
 export default function Stake() {
+    const { wallet } = useWallet();
+    const [contract, setContract] = useState<LudiContract>();
+    useEffect(() => {
+        if (wallet) {
+            setContract(new LudiContract(contractId, wallet));
+        }
+    }, [wallet]);
+    const [investment, setInvestment] = useState(0);
+    const [stakePoolInvestment, setStakePoolInvestment] = useState(0);
+    const [gamblePoolInvestment, setGamblePoolInvestment] = useState(0);
+
+    useEffect(() => {
+        fetchData();
+    }, [contract, stakePoolInvestment, gamblePoolInvestment]);
+
+
+    const fetchData = async () => {
+        setInvestment(stakePoolInvestment + gamblePoolInvestment);
+        if (contract) {
+            const getStakePoolValue = async () => {
+                const { value } = await contract.functions.get_stake_pool().get();
+                setStakePoolInvestment(value.toNumber() / 1000000000);
+            };
+
+            const getGamblePoolValue = async () => {
+                const { value } = await contract.functions.get_gamble_pool().get();
+                setGamblePoolInvestment(value.toNumber() / 1000000000);
+            };
+
+            getStakePoolValue();
+            getGamblePoolValue();
+        }
+    }
+
+    const fetcher = async () => {
+        setTimeout(() => {
+            fetchData();
+        }, 500);
+    }
+
+
     return (
         <div className="flex flex-col gap-4 p-4">
             <div className="flex flex-col w-full items-center justify-center">
@@ -236,14 +435,17 @@ export default function Stake() {
                 <p className="text-2xl font-mono">Your Investments</p>
             </div>
             <div className="flex flex-col pt-4 gap-4 w-full items-center justify-center">
-                <StakeCard />
+                <StakeCard fetchData={fetcher} investment={investment} />
             </div>
             <div className="flex flex-col gap-4 w-full justify-center pl-4 pt-4">
                 <p className="text-2xl font-mono">Your Portfolio</p>
                 <div className="grid grid-cols-2 gap-4">
                     <PortfolioCard />
-                    <StakeDistribution />
+                    <StakeDistribution stakePoolInvestment={stakePoolInvestment} gamblePoolInvestment={gamblePoolInvestment} />
                 </div>
+            </div>
+            <div className="flex flex-col gap-4 w-full justify-center pl-4 pt-4">
+                <WithdrawDialog fetchData={fetcher} />
             </div>
         </div>
     )
