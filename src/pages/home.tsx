@@ -1,7 +1,7 @@
 import { useNotification } from "@/hooks/useNotification";
 import { contractId } from "@/lib";
 import { LudiContract } from "@/sway-api";
-import { useWallet } from "@fuels/react";
+import { useConnectUI, useIsConnected, useWallet } from "@fuels/react";
 import { useEffect, useState } from "react";
 
 "use client"
@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/card"
 import { ChartContainer } from "@/components/ui/chart"
 import { Button } from "@/components/ui/button";
+import Stake from "@/components/stake";
+import Gamble from "@/components/gamble";
 
 function ChartComponent({ stakePoolValue, gamblePoolValue }: { stakePoolValue: number, gamblePoolValue: number }) {
     return (
@@ -186,7 +188,7 @@ function ReadPools() {
                     const asset = contract?.provider.getBaseAssetId();
                     const call = await contract!!.functions.deposit().callParams({
                         forward: [100000000, asset as string],
-                      }).call();
+                    }).call();
                     transactionSubmitNotification(call.transactionId);
                     const result = await call.waitForResult();
                     transactionSuccessNotification(result.transactionId);
@@ -214,13 +216,53 @@ function ReadPools() {
 }
 
 
-export default function Home() {
+function ConnectWallet() {
+    const { connect } = useConnectUI();
+    const { isConnected, refetch } = useIsConnected();
+
+    useEffect(() => {
+        refetch();
+    }, [refetch]);
+
     return (
-        <div>
-            Home
-            <div>
-                <ReadPools />
+        <div className="flex flex-col items-center justify-center h-full">
+            <Card>
+                <CardHeader>
+                    <CardTitle>Welcome to Ludi Finance</CardTitle>
+                    <CardDescription>Connect your wallet to get started</CardDescription>
+                </CardHeader>
+                <CardContent className="flex flex-col items-center justify-center gap-4">
+                    <Button onClick={() => connect()}>Connect Wallet</Button>
+                </CardContent>
+            </Card>
+        </div>
+    )
+}
+
+
+export default function Home() {
+    const { wallet, refetch: walletRefetch } = useWallet();
+    const { isConnected, refetch } = useIsConnected();
+
+    useEffect(() => {
+        refetch();
+        walletRefetch();
+    }, [refetch, walletRefetch]);
+    return (
+        <div className="h-screen flex flex-col gap-4">
+            <div className="flex flex-col items-center justify-center h-24">
+                <p className="text-5xl font-['Cedarville_Cursive']">ludi finance.</p>
             </div>
+            {isConnected ?
+                <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col border-border border-r">
+                        <Stake />
+                    </div>
+                    <div className="flex flex-col">
+                        <Gamble />
+                    </div>
+                </div>
+                : <ConnectWallet />}
         </div>
     )
 }
