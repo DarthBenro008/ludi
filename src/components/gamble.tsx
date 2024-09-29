@@ -4,13 +4,13 @@ import { Input } from "@/components/ui/input"
 import { Label as LabelUI } from "@/components/ui/label"
 import { useEffect, useRef, useState } from 'react';
 import { Button } from './ui/button';
-import { LudiContract } from '@/sway-api';
+import { LudiContract, VrfImpl } from '@/sway-api';
 import { contractId } from '@/lib';
 import { useWallet } from '@fuels/react';
 import { useNotification } from '@/hooks/useNotification';
 import { getRandomB256 } from 'fuels';
 
-export default function Gamble() {
+export default function Gamble({updateBalance}: {updateBalance: () => void}) {
     const [betAmount, setBetAmount] = useState(0);
     const [betNumber, setBetNumber] = useState<1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
     const [cheatValue, setCheatValue] = useState<1 | 2 | 3 | 4 | 5 | 6 | undefined>(undefined);
@@ -32,10 +32,11 @@ export default function Gamble() {
     const handleBet = async () => {
         setBetInProgress(true);
         try {
+            const vrfContract = new VrfImpl("0x749a7eefd3494f549a248cdcaaa174c1a19f0c1d7898fa7723b6b2f8ecc4828d", wallet!!);
             const asset = contract?.provider.getBaseAssetId();
             const call = await contract!!.functions.roll_dice(getRandomB256()).callParams({
                 forward: [betAmount * 1000000000, asset as string],
-            }).call();
+            }).addContracts([vrfContract]).call();
             transactionSubmitNotification(call.transactionId);
             const result = await call.waitForResult();
             transactionSuccessNotification(result.transactionId);
@@ -55,6 +56,7 @@ export default function Gamble() {
                 setCheatValue(randomNumber as 1 | 2 | 3 | 4 | 5 | 6 | undefined);
                 setTimeout(() => {
                     errorNotification("You lost!")
+                    updateBalance();
                 }, 1000);
             }
         } catch (e) {

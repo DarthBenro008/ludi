@@ -12,3 +12,5 @@
 
 export { LudiContract } from './LudiContract';
 export { LudiContractFactory } from './LudiContractFactory';
+export { VrfImpl } from './VrfImpl';
+export { VrfImplFactory } from './VrfImplFactory';

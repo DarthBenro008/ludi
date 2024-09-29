@@ -384,7 +384,7 @@ export function WithdrawDialog({ fetchData }: { fetchData: () => Promise<void> }
 }
 
 
-export default function Stake() {
+export default function Stake({balance}: {balance: number}) {
     const { wallet } = useWallet();
     const [contract, setContract] = useState<LudiContract>();
     useEffect(() => {
@@ -402,7 +402,7 @@ export default function Stake() {
 
 
     const fetchData = async () => {
-        setInvestment(stakePoolInvestment + gamblePoolInvestment);
+        setInvestment(stakePoolInvestment + gamblePoolInvestment + balance);
         if (contract) {
             const getStakePoolValue = async () => {
                 const { value } = await contract.functions.get_stake_pool().get();

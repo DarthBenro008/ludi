@@ -14,7 +14,7 @@ export const playgroundUrl = providerUrl.replace("v1/graphql", "v1/playground");
 
 export const localContractId = contractIds.ludiContract;
 export const testnetContractId = process.env.VITE_TESTNET_CONTRACT_ID as string;
-export const contractId = isLocal ? localContractId : testnetContractId;
+export const contractId = "0x8a5760e34f003be492c69264324d41f5cea1579199b09951b4c016245ee59baa";
 
 export const testnetFaucetUrl = "https://faucet-testnet.fuel.network/";
 
