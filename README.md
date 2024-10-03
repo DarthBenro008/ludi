@@ -57,7 +57,7 @@ Ludi Finance offers a unique blend of decentralized finance and gambling, cateri
 
 # Technologies Used
 
-- Orao VRF for transparent and secure random number generation.
+- [Orao VRF](https://github.com/orao-network/fuel-vrf) for transparent and secure random number generation.
 - Fuel smart contracts for secure and decentralized financial operations.
 - Vite and Tailwind CSS for the frontend.
 
@@ -80,18 +80,28 @@ This is a [Vite](https://vitejs.dev/) project bootstrapped with [`create-fuels`]
 1. Start the Fuel development server. This server will start a local Fuel node and provide hot-reloading for your smart contracts.
 
 ```bash
-npm run fuels:dev
+pnpm fuels:dev
 ```
 
 2. Start the Next.js development server.
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 ## Deploying to Testnet
 
 To learn how to deploy your Fuel dApp to the testnet, you can follow our [Deploying to Testnet](https://docs.fuel.network/docs/fuels-ts/creating-a-fuel-dapp/deploying-a-dapp-to-testnet/) guide.
+
+or simply run the following command to deploy to testnet
+
+```bash
+cd sway-programs/contracts
+forc deploy --testnet
+```
+
+## Video Presentation
+[Ludi Finance - Stake, Gamble and Earn!](https://ludi-demo.benro.dev/)
 
 ## Learn More
 
